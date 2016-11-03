@@ -705,7 +705,7 @@ class FalseNode extends ExpNode {
 class IdNode extends ExpNode {
 
     //constructor method if IdNode is used (not declared)
-    public IdNode(int lineNum, int charNum, String strVal, SemSym link) {
+    public IdNode(int lineNum, int charNum, String strVal, Sym link) {
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
@@ -730,8 +730,9 @@ class IdNode extends ExpNode {
     private String myStrVal;
 
 
-    private SemSym symTableLink;
+    private Sym symTableLink;
 
+    private SemSym symbol;
 }
 
 class DotAccessExpNode extends ExpNode {
