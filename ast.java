@@ -133,7 +133,6 @@ class ProgramNode extends ASTnode {
      */
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
-	      // TODO: Add code here
         //Need to add a scope (The program scope, i.e, globals, functions, structs, etc)
         symTab.addScope();
         //1) Once scope is created, need to process declarations, add new entries
@@ -261,7 +260,6 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
-  //not sure if we need this:
   abstract void nameAnalysis(SymTable symbolTable);
 }
 
@@ -273,10 +271,17 @@ class VarDeclNode extends DeclNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-      String varIdValue = "";
-      SemSym varSymValue = null;
-
-      symbolTable.addDecl(varIdValue, varSymValue);
+	String varIdValue = ;
+	SemSym varSymValue = null;
+	if(myType instanceof VoidNode) {
+		fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+	} else {
+		try{
+        		symbolTable.addDecl(varIdValue, varSymValue);
+    		catch (DuplicateSymException ex) {
+			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+		}
+	}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -309,8 +314,11 @@ class FnDeclNode extends DeclNode {
     public void nameAnalysis(SymTable symbolTable) {
         String fnIdValue = "";
         SemSym fnSymValue = null;
-
-        symbolTable.addDecl(fnIdValue, fnSymValue);
+	try{
+        	symbolTable.addDecl(fnIdValue, fnSymValue);
+	} catch(DuplicateSymException ex) {
+		fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+	}	
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -339,14 +347,17 @@ class FormalDeclNode extends DeclNode {
     }
 
      public void nameAnalysis(SymTable symbolTable) {
-       String formalIdValue = "";
-       SemSym formalSymValue = null;
-
-       try{
-		symbolTable.addDecl(formalIdValue, formalSymValue);
-	}
-	catch(DuplicateSymException e){
-		fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+        String formalIdValue = "";
+        SemSym formalSymValue = null;
+	if (myType instanceof VoidNode) {
+		fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+	} else {
+		try{
+			symbolTable.addDecl(formalIdValue, formalSymValue);
+		}
+		catch(DuplicateSymException e){
+			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+		}	
 	}
      }
 
@@ -365,6 +376,10 @@ class StructDeclNode extends DeclNode {
     public StructDeclNode(IdNode id, DeclListNode declList) {
         myId = id;
         myDeclList = declList;
+    }
+
+    public void nameAnalysis() {
+
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -522,6 +537,12 @@ class IfStmtNode extends StmtNode {
         myStmtList = slist;
     }
 
+    public void nameAnalysis(SymTable symbolTable) {
+	//need to add a scope for the if block
+	symbolTable.addScope();
+	//Do name analysis on the decl's and the stmt's
+    }
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("if (");
@@ -533,7 +554,7 @@ class IfStmtNode extends StmtNode {
         p.println("}");
     }
 
-    // e kids
+    // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
@@ -548,6 +569,10 @@ class IfElseStmtNode extends StmtNode {
         myThenStmtList = slist1;
         myElseDeclList = dlist2;
         myElseStmtList = slist2;
+    }
+    
+    public void nameAnalysis(SymTable symbolTable) {
+	//need to add a scope for both the if block and the else block
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -580,6 +605,12 @@ class WhileStmtNode extends StmtNode {
         myExp = exp;
         myDeclList = dlist;
         myStmtList = slist;
+    }
+
+    public void nameAnalysis(SymTable symbolTable) {
+	//need to add a scope
+	symbolTable.addScope();
+	//need to do name analysis on the decl's and the stmt's
     }
 
     public void unparse(PrintWriter p, int indent) {
