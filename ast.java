@@ -653,10 +653,20 @@ class FalseNode extends ExpNode {
 }
 
 class IdNode extends ExpNode {
-    public IdNode(int lineNum, int charNum, String strVal) {
+
+    //constructor method if IdNode is used (not declared)	
+    public IdNode(int lineNum, int charNum, String strVal, Sym link) {
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
+	symTableLink = link;	
+    }
+
+   //constructor method if IdNode is a declaration.
+    public IdNode(int lineNum, int charNum, String strVal) {
+        myLineNum = lineNum;
+        myCharNum = charNum;
+        myStrVal = strVal;	
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -666,6 +676,7 @@ class IdNode extends ExpNode {
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
+    private Sym symTableLink;
 }
 
 class DotAccessExpNode extends ExpNode {
