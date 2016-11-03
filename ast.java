@@ -738,7 +738,7 @@ class IdNode extends ExpNode {
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
-	      symTableLink = link;
+	      symbol = link;
     }
 
    //constructor method if IdNode is a declaration.
@@ -750,13 +750,13 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
-        p.print("(" + symTableLink.getType() + ")");
+        p.print("(" + symbol.getType() + ")");
     }
 
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
-    private SemSym symTableLink;
+    private SemSym symbol;
 }
 
 class DotAccessExpNode extends ExpNode {
@@ -772,9 +772,16 @@ class DotAccessExpNode extends ExpNode {
 		myId.unparse(p, 0);
     }
 
+    public void nameAnalysis(SymTable symbolTable) {
+
+	//TODO: pull
+
+    }
+
     // 2 kids
     private ExpNode myLoc;
     private IdNode myId;
+    private SemSym symbol;
 }
 
 class AssignNode extends ExpNode {
