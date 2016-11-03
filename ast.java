@@ -137,10 +137,17 @@ class ProgramNode extends ASTnode {
         symTab.addScope();
         //1) Once scope is created, need to process declarations, add new entries
         //to the symbol table, and report any variables that are multiply declared
+<<<<<<< HEAD
         DeclListNode.nameAnalysis();
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
         
+=======
+        DeclListNode.nameAnalysis(symTab);
+        //process the statements, find usage of undeclared variables, and update the ID
+        //nodes of the AST to point to the appropriate symbol-table entry
+
+>>>>>>> ScottsBranch
         //2) Process all of the statements in the program again, using the symbol
         //table info to determine the type of each expression and finding type errors
 
@@ -159,11 +166,19 @@ class DeclListNode extends ASTnode {
         myDecls = S;
     }
 
+<<<<<<< HEAD
     public void nameAnalysis() {
       //Each dNode inherits and abstract method from declNode to do name analysis on
       //need to implement nameAnalysis for each typ of DeclNode
       for(DeclNode dNode : myDecls){
         dNode.nameAnalysis();
+=======
+    public void nameAnalysis(SymTable symbolTable) {
+      //Each dNode inherits and abstract method from declNode to do name analysis on
+      //need to implement nameAnalysis for each type of DeclNode
+      for(DeclNode dNode : myDecls){
+        dNode.nameAnalysis(symbolTable);
+>>>>>>> ScottsBranch
       }
     }
 
@@ -260,7 +275,11 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
+<<<<<<< HEAD
   public void nameAnalysis();
+=======
+  public void nameAnalysis(SymTable symbolTable);
+>>>>>>> ScottsBranch
 }
 
 class VarDeclNode extends DeclNode {
@@ -270,9 +289,17 @@ class VarDeclNode extends DeclNode {
         mySize = size;
     }
 
+<<<<<<< HEAD
     public void nameAnalysis() {
       SymTable symTab = new SymTable();
       // TODO: Add code here
+=======
+    public void nameAnalysis(SymTable symbolTable) {
+      String varIdValue = "";
+      SemSym varSymValue = null;
+
+      symbolTable.addDecl(varIdValue, varSymValue);
+>>>>>>> ScottsBranch
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -303,8 +330,17 @@ class FnDeclNode extends DeclNode {
     }
 
     public void nameAnalysis() {
+<<<<<<< HEAD
       SymTable symTab = new SymTable();
       // TODO: Add code here
+=======
+      public void nameAnalysis(SymTable symbolTable) {
+        String fnIdValue = "";
+        SemSym fnSymValue = null;
+
+        symbolTable.addDecl(fnIdValue, fnSymValue);
+      }
+>>>>>>> ScottsBranch
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -689,8 +725,21 @@ class FalseNode extends ExpNode {
 
 class IdNode extends ExpNode {
 
+<<<<<<< HEAD
     //constructor method if IdNode is used (not declared)	
     public IdNode(int lineNum, int charNum, String strVal, Sym link) {
+=======
+    //constructor method if IdNode is used (not declared)
+    public IdNode(int lineNum, int charNum, String strVal, Sym link) {
+        myLineNum = lineNum;
+        myCharNum = charNum;
+        myStrVal = strVal;
+	      symTableLink = link;
+    }
+
+   //constructor method if IdNode is a declaration.
+    public IdNode(int lineNum, int charNum, String strVal) {
+>>>>>>> ScottsBranch
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
@@ -713,11 +762,16 @@ class IdNode extends ExpNode {
     private int myCharNum;
     private String myStrVal;
 <<<<<<< HEAD
+<<<<<<< HEAD
     private Sym symTableLink;
 =======
     private SemSym symbol;
 >>>>>>> adding some name analysis stuffs
 }
+=======
+    private SemSym symbol;
+}
+>>>>>>> ScottsBranch
 
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
