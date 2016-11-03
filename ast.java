@@ -6,7 +6,7 @@ import java.util.*;
 // represents a Mini program.
 //
 // Internal nodes of the tree contain pointers to children, organized
-// either in a list (for nodes that may have a variable number of 
+// either in a list (for nodes that may have a variable number of
 // children) or as a fixed set of fields.
 //
 // The nodes for literals and ids contain line and character number
@@ -64,7 +64,7 @@ import java.util.*;
 //         UnaryMinusNode
 //         NotNode
 //       BinaryExpNode       ExpNode ExpNode
-//         PlusNode     
+//         PlusNode
 //         MinusNode
 //         TimesNode
 //         DivideNode
@@ -91,7 +91,7 @@ import java.util.*;
 // (3) Internal nodes with fixed numbers of kids:
 //        ProgramNode,     VarDeclNode,     FnDeclNode,     FormalDeclNode,
 //        StructDeclNode,  FnBodyNode,      StructNode,     AssignStmtNode,
-//        PostIncStmtNode, PostDecStmtNode, ReadStmtNode,   WriteStmtNode   
+//        PostIncStmtNode, PostDecStmtNode, ReadStmtNode,   WriteStmtNode
 //        IfStmtNode,      IfElseStmtNode,  WhileStmtNode,  CallStmtNode
 //        ReturnStmtNode,  DotAccessNode,   AssignExpNode,  CallExpNode,
 //        UnaryExpNode,    BinaryExpNode,   UnaryMinusNode, NotNode,
@@ -105,7 +105,7 @@ import java.util.*;
 // ASTnode class (base class for all other kinds of nodes)
 // **********************************************************************
 
-abstract class ASTnode { 
+abstract class ASTnode {
     // every subclass must provide an unparse operation
     abstract public void unparse(PrintWriter p, int indent);
 
@@ -126,13 +126,24 @@ class ProgramNode extends ASTnode {
     }
 
     /**
-     * Sample name analysis method. 
+     * Sample name analysis method.
      * Creates an empty symbol table for the outermost scope, then processes
      * all of the globals, struct defintions, and functions in the program.
      */
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
-	// TODO: Add code here 
+	      // TODO: Add code here
+        //Need to add a scope (The program scope, i.e, globals, functions, structs, etc)
+        symTab.addScope();
+        //1) Once scope is created, need to process declarations, add new entries
+        //to the symbol table, and report any variables that are multiply declared
+        DeclListNode.nameAnalysis(symTab);
+        //process the statements, find usage of undeclared variables, and update the ID
+        //nodes of the AST to point to the appropriate symbol-table entry
+
+        //2) Process all of the statements in the program again, using the symbol
+        //table info to determine the type of each expression and finding type errors
+
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -146,6 +157,14 @@ class ProgramNode extends ASTnode {
 class DeclListNode extends ASTnode {
     public DeclListNode(List<DeclNode> S) {
         myDecls = S;
+    }
+
+    public void nameAnalysis(SymTable symbolTable) {
+      //Each dNode inherits and abstract method from declNode to do name analysis on
+      //need to implement nameAnalysis for each type of DeclNode
+      for(DeclNode dNode : myDecls){
+        dNode.nameAnalysis(symbolTable);
+      }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -177,7 +196,7 @@ class FormalsListNode extends ASTnode {
                 p.print(", ");
                 it.next().unparse(p, indent);
             }
-        } 
+        }
     }
 
     // list of kids (FormalDeclNodes)
@@ -229,7 +248,7 @@ class ExpListNode extends ASTnode {
                 p.print(", ");
                 it.next().unparse(p, indent);
             }
-        } 
+        }
     }
 
     // list of kids (ExpNodes)
@@ -241,6 +260,7 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
+  public void nameAnalysis(SymTable symbolTable);
 }
 
 class VarDeclNode extends DeclNode {
@@ -248,6 +268,13 @@ class VarDeclNode extends DeclNode {
         myType = type;
         myId = id;
         mySize = size;
+    }
+
+    public void nameAnalysis(SymTable symbolTable) {
+      String varIdValue = "";
+      SemSym varSymValue = null;
+
+      symbolTable.addDecl(varIdValue, varSymValue);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -277,6 +304,15 @@ class FnDeclNode extends DeclNode {
         myBody = body;
     }
 
+    public void nameAnalysis() {
+      public void nameAnalysis(SymTable symbolTable) {
+        String fnIdValue = "";
+        SemSym fnSymValue = null;
+
+        symbolTable.addDecl(fnIdValue, fnSymValue);
+      }
+    }
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         myType.unparse(p, 0);
@@ -300,6 +336,11 @@ class FormalDeclNode extends DeclNode {
     public FormalDeclNode(TypeNode type, IdNode id) {
         myType = type;
         myId = id;
+    }
+
+    public void nameAnalysis() {
+      SymTable symTab = new SymTable();
+      // TODO: Add code here
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -378,7 +419,7 @@ class StructNode extends TypeNode {
         p.print("struct ");
 		myId.unparse(p, 0);
     }
-	
+
 	// 1 kid
     private IdNode myId;
 }
@@ -516,7 +557,7 @@ class IfElseStmtNode extends StmtNode {
         myElseDeclList.unparse(p, indent+4);
         myElseStmtList.unparse(p, indent+4);
         doIndent(p, indent);
-        p.println("}");        
+        p.println("}");
     }
 
     // 5 kids
@@ -533,7 +574,7 @@ class WhileStmtNode extends StmtNode {
         myDeclList = dlist;
         myStmtList = slist;
     }
-	
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("while (");
@@ -653,6 +694,16 @@ class FalseNode extends ExpNode {
 }
 
 class IdNode extends ExpNode {
+
+    //constructor method if IdNode is used (not declared)
+    public IdNode(int lineNum, int charNum, String strVal, Sym link) {
+        myLineNum = lineNum;
+        myCharNum = charNum;
+        myStrVal = strVal;
+	      symTableLink = link;
+    }
+
+   //constructor method if IdNode is a declaration.
     public IdNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
         myCharNum = charNum;
@@ -661,16 +712,18 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
+        p.print("(" + symbol.type + ")");
     }
 
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
+    private SemSym symbol;
 }
 
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
-        myLoc = loc;	
+        myLoc = loc;
         myId = id;
     }
 
@@ -682,7 +735,7 @@ class DotAccessExpNode extends ExpNode {
     }
 
     // 2 kids
-    private ExpNode myLoc;	
+    private ExpNode myLoc;
     private IdNode myId;
 }
 
