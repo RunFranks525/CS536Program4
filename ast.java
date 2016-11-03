@@ -313,12 +313,12 @@ class FnDeclNode extends DeclNode {
 
     public void nameAnalysis(SymTable symbolTable) {
         String fnIdValue = "";
-        SemSym fnSymValue = null;
-	try{
-        	symbolTable.addDecl(fnIdValue, fnSymValue);
-	} catch(DuplicateSymException ex) {
-		fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
-	}	
+        SemSym fnSymValue = myId.getSymbol();
+	      try{
+          symbolTable.addDecl(fnIdValue, fnSymValue);
+	      } catch(DuplicateSymException ex) {
+		        fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+	      }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -357,7 +357,7 @@ class FormalDeclNode extends DeclNode {
 		}
 		catch(DuplicateSymException e){
 			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
-		}	
+		}
 	}
      }
 
@@ -570,7 +570,7 @@ class IfElseStmtNode extends StmtNode {
         myElseDeclList = dlist2;
         myElseStmtList = slist2;
     }
-    
+
     public void nameAnalysis(SymTable symbolTable) {
 	//need to add a scope for both the if block and the else block
     }
@@ -751,6 +751,14 @@ class IdNode extends ExpNode {
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
         p.print("(" + symbol.getType() + ")");
+    }
+
+    public SemSym getSymbol() {
+      return this.symbol;
+    }
+
+    public String getIdValue() {
+      return this.myStrVal;
     }
 
     private int myLineNum;
