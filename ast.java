@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.*;
-import 
+import
 
 // **********************************************************************
 // The ASTnode class defines the nodes of the abstract-syntax tree that
@@ -138,7 +138,6 @@ class ProgramNode extends ASTnode {
         symTab.addScope();
         //1) Once scope is created, need to process declarations, add new entries
         //to the symbol table, and report any variables that are multiply declared
-
         DeclListNode.nameAnalysis(symTab);
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
@@ -166,7 +165,6 @@ class DeclListNode extends ASTnode {
       //need to implement nameAnalysis for each type of DeclNode
       for(DeclNode dNode : myDecls){
         dNode.nameAnalysis(symbolTable);
-
       }
     }
 
@@ -263,10 +261,7 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
-
-  
   public void nameAnalysis(SymTable symbolTable);
-
 }
 
 class VarDeclNode extends DeclNode {
@@ -276,14 +271,11 @@ class VarDeclNode extends DeclNode {
         mySize = size;
     }
 
-
-    
     public void nameAnalysis(SymTable symbolTable) {
       String varIdValue = "";
       SemSym varSymValue = null;
 
       symbolTable.addDecl(varIdValue, varSymValue);
-
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -312,15 +304,13 @@ class FnDeclNode extends DeclNode {
         myFormalsList = formalList;
         myBody = body;
     }
-      
-     public void nameAnalysis(SymTable symbolTable) {
+
+    public void nameAnalysis(SymTable symbolTable) {
         String fnIdValue = "";
         SemSym fnSymValue = null;
 
         symbolTable.addDecl(fnIdValue, fnSymValue);
-      }
-
-    
+    }
 
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
@@ -348,8 +338,12 @@ class FormalDeclNode extends DeclNode {
     }
 
     public void nameAnalysis() {
-      SymTable symTab = new SymTable();
-      // TODO: Add code here
+      public void nameAnalysis(SymTable symbolTable) {
+        String formalIdValue = "";
+        SemSym formalSymValue = null;
+
+        symbolTable.addDecl(formalIdValue, formalSymValue);
+      }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -714,10 +708,9 @@ class IdNode extends ExpNode {
 
    //constructor method if IdNode is a declaration.
     public IdNode(int lineNum, int charNum, String strVal) {
-
         myLineNum = lineNum;
         myCharNum = charNum;
-        myStrVal = strVal;	
+        myStrVal = strVal;
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -728,10 +721,7 @@ class IdNode extends ExpNode {
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
-
-
     private SemSym symTableLink;
-
 }
 
 class DotAccessExpNode extends ExpNode {
