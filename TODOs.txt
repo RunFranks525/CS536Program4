@@ -1,7 +1,0 @@
-Here are tasks for P4:
-1. write name analysis methods in ast.java
-2. modify SemSym.java - include new fields and methods
-3. modify ast.java for IdNode class - include new Sym field, modify unparse method
-4. modify ErrMsg.java to give more appropriate error messages
-5. figure out Makefile
-6. writing test inputs

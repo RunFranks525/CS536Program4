@@ -138,7 +138,7 @@ class ProgramNode extends ASTnode {
         symTab.addScope();
         //1) Once scope is created, need to process declarations, add new entries
         //to the symbol table, and report any variables that are multiply declared
-        DeclListNode.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab);
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
 
@@ -161,7 +161,7 @@ class DeclListNode extends ASTnode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-      //Each dNode inherits and abstract method from declNode to do name analysis on
+      //Each dNode inherits an abstract method from declNode to do name analysis on
       //need to implement nameAnalysis for each type of DeclNode
       for(DeclNode dNode : myDecls){
         dNode.nameAnalysis(symbolTable);
@@ -261,7 +261,8 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
-  public void nameAnalysis(SymTable symbolTable);
+  //not sure if we need this:
+  abstract void nameAnalysis(SymTable symbolTable);
 }
 
 class VarDeclNode extends DeclNode {
@@ -337,14 +338,17 @@ class FormalDeclNode extends DeclNode {
         myId = id;
     }
 
-    public void nameAnalysis() {
-      public void nameAnalysis(SymTable symbolTable) {
-        String formalIdValue = "";
-        SemSym formalSymValue = null;
+     public void nameAnalysis(SymTable symbolTable) {
+       String formalIdValue = "";
+       SemSym formalSymValue = null;
 
-        symbolTable.addDecl(formalIdValue, formalSymValue);
-      }
-    }
+       try{
+		symbolTable.addDecl(formalIdValue, formalSymValue);
+	}
+	catch(DuplicateSymException e){
+		fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+	}
+     }
 
     public void unparse(PrintWriter p, int indent) {
         myType.unparse(p, 0);
@@ -715,7 +719,7 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
-        p.print("(" + symbol.type + ")");
+        p.print("(" + symTableLink.getType() + ")");
     }
 
     private int myLineNum;
