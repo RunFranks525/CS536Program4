@@ -506,7 +506,7 @@ class PostIncStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post incrementing an int
-      myExp.nameAnalysis(symbolTable);
+      myExp.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -526,7 +526,7 @@ class PostDecStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post decrementing an int
-      myExp.nameAnalysis(symbolTable);
+      myExp.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -545,7 +545,7 @@ class ReadStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-      myExp.nameAnalysis(symbolTable);
+      myExp.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -565,7 +565,7 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-      myExp.nameAnalysis(symbolTable);
+      myExp.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -587,7 +587,7 @@ class IfStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-	    myExp.nameAnalysis(symbolTable);
+	    myExp.nameAnalysisUsage(symbolTable);
 	    //need to add a scope for the if block
 	    symbolTable.addScope();
 	    //Do name analysis on the decl's and the stmt's
@@ -625,7 +625,7 @@ class IfElseStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-	    myExp.nameAnalysis(symbolTable);
+	    myExp.nameAnalysisUsage(symbolTable);
 	    //need to add a scope for both the if block and the else block
       symbolTable.addScope();
       nameAnalysis(symbolTable, myThenDeclList, myThenStmtList);
@@ -674,7 +674,7 @@ class WhileStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-      myExp.nameAnalysis(symbolTable);
+      myExp.nameAnalysisUsage(symbolTable);
       //need to add a scope
       symbolTable.addScope();
       //need to do name analysis on the decl's and the stmt's
@@ -726,7 +726,7 @@ class ReturnStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symTable) {
-      myExp.nameAnalysis(symTable);
+      myExp.nameAnalysisUsage(symTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -855,7 +855,7 @@ class IdNode extends ExpNode {
     }
 
     public int getIdPosition() {
-      return {this.myLineNum, this.myCharNum};
+      return new int[]{this.myLineNum, this.myCharNum};
     }
 
     public void setSymbol(SemSym symbol) {
@@ -875,9 +875,8 @@ class DotAccessExpNode extends ExpNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-
-	myId.nameAnalysis(symbolTable);
-	myLoc.nameAnalysis(symbolTable);
+	    myId.nameAnalysisUsage(symbolTable);
+	    myLoc.nameAnalysisUsage(symbolTable);
 
     }
 
@@ -886,10 +885,6 @@ class DotAccessExpNode extends ExpNode {
 		  myLoc.unparse(p, 0);
 		  p.print(").");
 		  myId.unparse(p, 0);
-    }
-
-
-
     }
 
     // 2 kids
@@ -915,14 +910,6 @@ class AssignNode extends ExpNode {
 		  p.print(" = ");
 		  myExp.unparse(p, 0);
 		  if (indent != -1)  p.print(")");
-    }
-
-    public ExpNode getLhs() {
-      return this.myLhs;
-    }
-
-    public ExpNode getExp() {
-      return this.myExp;
     }
 
     // 2 kids
