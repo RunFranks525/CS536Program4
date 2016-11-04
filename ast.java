@@ -616,14 +616,19 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-      String name = myExp.getIdValue();
-      SemSym symbol = symbolTable.lookupGlobal(name);
-      if (symbol == null) {
-        ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
-      }
-      myExp.setSymbol(symbol);
-    }
 
+      try{
+       IdNode iNode = (IdNode)myExp;
+       String name = iNode.getIdValue();
+       SemSym symbol = symbolTable.lookupGlobal(name);
+       if (symbol == null) {
+         ErrMsg.fatal(iNode.myLineNum, iNode.myCharNum, "Use of an undeclared identifier");
+       }
+       iNode.setSymbol(symbol);
+     } 
+     catch(ClassCastException ex){
+     }
+    }
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("cout << ");
@@ -806,7 +811,7 @@ class ReturnStmtNode extends StmtNode {
         String name = myExpId.getIdValue();
         SemSym symbol = symTable.lookupGlobal(name);
         if (symbol == null) {
-          ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
+          ErrMsg.fatal(myExpId.myLineNum, myExpId.myCharNum, "Use of an undeclared identifier");
         }
         myExpId.setSymbol(symbol);
       } catch (ClassCastException ex) {
@@ -942,8 +947,8 @@ class DotAccessExpNode extends ExpNode {
 
     public void nameAnalysis(SymTable symbolTable) {
 	//TODO: look up to see if ID is in the symTable in current scope
-	if(symbolTable.lookupGlobal(myId.getIdVal) == null){
-		ErrMsg.fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+	if(symbolTable.lookupGlobal(myId.getIdValue()) == null){
+		ErrMsg.fatal(myId.myLineNum, myId.myCharNum, "Undeclared identifier");
 	}
 
     }
@@ -1026,7 +1031,7 @@ abstract class UnaryExpNode extends ExpNode {
             String name = expId.getIdValue();
             SemSym symbol = symbolTable.lookupGlobal(name);
             if(symbol == null) {
-              ErrMsg.fatal(exp.myLineNum, exp.myCharNum, "Undeclared identifier");
+              ErrMsg.fatal(expId.myLineNum, expId.myCharNum, "Undeclared identifier");
             }
             exp.setSymbol(symbol);
           } catch (ClassCastException ex) {
