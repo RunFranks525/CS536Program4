@@ -486,7 +486,7 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-      myAssign.nameAnalysis(symbolTable);
+      myAssign.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -707,7 +707,7 @@ class CallStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-	    myCall.nameAnalysis(symbolTable);
+	    myCall.nameAnalysisUsage(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -828,7 +828,7 @@ class IdNode extends ExpNode {
       String idKey = this.myStrVal;
       SemSym idValue = new SemSym(type);
       try {
-        if (symbolTable.lookupLocal(varIdValue) != null) {
+        if (symbolTable.lookupLocal(idKey) != null) {
           throw new DuplicateSymException();
         } else {
           symbolTable.addDecl(idKey, idValue);
@@ -841,7 +841,7 @@ class IdNode extends ExpNode {
 
     public void nameAnalysisUsage(SymTable symbolTable){
       String name = this.myStrVal;
-      SemSym symbol = symTable.lookupGlobal(name);
+      SemSym symbol = symbolTable.lookupGlobal(name);
       if (symbol == null) {
         ErrMsg.fatal(this.myLineNum, this.myCharNum, "Use of an undeclared identifier");
       } else {
@@ -854,10 +854,15 @@ class IdNode extends ExpNode {
         p.print("(" + symbol.getType() + ")");
     }
 
+<<<<<<< HEAD
     public int getIdPosition() {
 
       return new int[]{myLineNum, myCharNum};
 
+=======
+    public int[] getIdPosition() {
+      return new int[]{this.myLineNum, this.myCharNum};
+>>>>>>> squashing buggies
     }
 
     public void setSymbol(SemSym symbol) {
@@ -939,7 +944,7 @@ class CallExpNode extends ExpNode {
 
     public void nameAnalysisUsage(SymTable symbolTable) {
       myId.nameAnalysisUsage(symbolTable);
-      myExpList.nameAnalysisUsage(symbolTable);
+      myExpList.nameAnalysis(symbolTable);
     }
 
     // ** unparse **
