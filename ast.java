@@ -294,7 +294,8 @@ class VarDeclNode extends DeclNode {
       if(!varType.equals("void")){
         myId.nameAnalysisDecl(symbolTable, myType.getTypeString());
       } else {
-        ErrMsg.fatal(,"Non-function declared void");
+        int[] position = myId.getIdPosition();
+        ErrMsg.fatal(position[0], position[1],"Non-function declared void");
       }
     }
 
@@ -352,23 +353,24 @@ class FnDeclNode extends DeclNode {
 
 class FormalDeclNode extends DeclNode {
     public FormalDeclNode(TypeNode type, IdNode id) {
-        myType = type;
-        myId = id;
+      myType = type;
+      myId = id;
     }
 
-     public void nameAnalysis(SymTable symbolTable) {
-       String typeString = myType.getTypeString();
-       if (!typeString.equals("void")) {
-         myId.nameAnalysisDecl(symbolTable, myType.getTypeString());
-       } else {
-         ErrMsg.fatal(,"Non-function declared void");
-       }
-     }
+    public void nameAnalysis(SymTable symbolTable) {
+      String typeString = myType.getTypeString();
+      if (!typeString.equals("void")) {
+        myId.nameAnalysisDecl(symbolTable, myType.getTypeString());
+      } else {
+        int[] position = myId.getIdPosition();
+        ErrMsg.fatal(position[0], position[1],"Non-function declared void");
+      }
+    }
 
     public void unparse(PrintWriter p, int indent) {
-        myType.unparse(p, 0);
-        p.print(" ");
-        myId.unparse(p, 0);
+      myType.unparse(p, 0);
+      p.print(" ");
+      myId.unparse(p, 0);
     }
 
     // 2 kids
@@ -701,8 +703,7 @@ class CallStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-	    IdNode callId = myCall.getIdNode();
-	    ExpListNode callExp = myCall.getExpListNode();
+	    myCall.nameAnalysis(symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -829,7 +830,7 @@ class IdNode extends ExpNode {
           symbolTable.addDecl(idKey, idValue);
         }
       } catch (DuplicateSymException ex1) {
-        ErrMsg.fatal(myId.myLineNum, myId.myCharNum, "Multiply declared identifier");
+        ErrMsg.fatal(this.myLineNum, this.myCharNum, "Multiply declared identifier");
       } catch (EmptySymTableException ex2) {
       }
     }
@@ -838,7 +839,7 @@ class IdNode extends ExpNode {
       String name = this.myStrVal;
       SemSym symbol = symTable.lookupGlobal(name);
       if (symbol == null) {
-        ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
+        ErrMsg.fatal(this.myLineNum, this.myCharNum, "Use of an undeclared identifier");
       } else {
         this.symbol = symbol;
       }
@@ -847,6 +848,10 @@ class IdNode extends ExpNode {
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
         p.print("(" + symbol.getType() + ")");
+    }
+
+    public int getIdPosition() {
+      return {this.myLineNum, this.myCharNum};
     }
 
     public void setSymbol(SemSym symbol) {
