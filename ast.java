@@ -483,7 +483,7 @@ class AssignStmtNode extends StmtNode {
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null){
           //no entry in the table
-          ErrMsg.fatal(lhsId.lineNum, lhsId.charNum, "Use of an undeclared identifier");
+          ErrMsg.fatal(lhsId.myLlineNum, lhsId.myCharNum, "Use of an undeclared identifier");
         }
         //when do we use global over local?
         lhsId.setSymbol(symbol);
@@ -492,7 +492,7 @@ class AssignStmtNode extends StmtNode {
         String name = expId.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if (symbol == null) {
-          ErrMsg.fatal(expId.lineNum, expId.charNum, "Use of an undeclared identifier");
+          ErrMsg.fatal(expId.myLineNum, expId.myCharNum, "Use of an undeclared identifier");
         }
         expId.setSymbol(symbol);
       }
