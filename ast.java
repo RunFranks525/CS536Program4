@@ -279,14 +279,20 @@ class VarDeclNode extends DeclNode {
     public void nameAnalysis(SymTable symbolTable) {
 	      String varIdValue = myId.getIdValue();
 	      SemSym varSymValue = new SemSym(myType.getTypeString());
-	      if(varSymValue.getType().equals("void")) {
+	      if (varSymValue.getType().equals("void")) {
 		        ErrMsg.fatal(myId.myLineNum, myId.myCharNum, "Non-function declared void");
 	      } else {
 	         try {
-             symbolTable.addDecl(varIdValue, varSymValue);
-           } catch (DuplicateSymException ex) {
+             if (symbolTable.lookupLocal(varIdValue) != null) {
+               throw new DuplicateSymException();
+             } else {
+               symbolTable.addDecl(varIdValue, varSymValue);
+             }
+           } catch (DuplicateSymException ex1) {
 		           ErrMsg.fatal(myId.myLineNum, myId.myCharNum, "Multiply declared identifier");
-  	       }
+  	       } catch (EmptySymTableException ex2) {
+
+           }
 	     }
     }
 
@@ -482,6 +488,7 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
+<<<<<<< HEAD
       ExpNode lhsId = myAssign.getLhs();
       ExpNode expId = myAssign.getExp();
       if(lhsId instanceof IdNode){
@@ -509,13 +516,24 @@ class AssignStmtNode extends StmtNode {
       }
       if(expId instanceof IdNode){
         String name = expId.getIdValue();
-        SemSym symbol = symbolTable.lookupGlobal(name);
-        if (symbol == null) {
-          ErrMsg.fatal(expId.myLineNum, expId.myCharNum, "Use of an undeclared identifier");
-        }
-        expId.setSymbol(symbol);
-      }
+=======
+      nameAnalysis(symbolTable, myAssign.getLhs());
+      nameAnalysis(symbolTable, myAssign.getExp());
     }
+
+    private void nameAnalysis(SymTable symbolTable, ExpNode myExp){
+      try{
+        IdNode myExpId = (IdNode) myExp;
+        String name = myExpId.getIdValue();
+>>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
+        SemSym symbol = symbolTable.lookupGlobal(name);
+        if(symbol == null) {
+          ErrMsg.fatal(myExpId.myLineNum, myExpId.myCharNum, "Undeclared identifier");
+        }
+        myExpId.setSymbol(symbol);
+      } catch (ClassCastException ex) {
+        //exp is not an IdNode, move on
+      }
 
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
@@ -772,9 +790,15 @@ class CallStmtNode extends StmtNode {
         myCall = call;
     }
 
+<<<<<<< HEAD
     abstract void nameAnalysis(SymTable symbolTable){
 	IdNode callId = myCall.getIdNode();
 	ExpListNode callExp = myCall.getExpListNode();
+=======
+    public void nameAnalysis(SymTable symbolTable) {
+      //name analysis on the CallStmtNode
+      String name =
+>>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -788,20 +812,21 @@ class CallStmtNode extends StmtNode {
 }
 
 class ReturnStmtNode extends StmtNode {
-  //Exit scope here?
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
 
     public void nameAnalysis(SymTable symTable) {
-      //Do we exit a scope here?
-      if(myExp instanceof IdNode) {
-        String name = myExp.getIdValue();
+      try{
+        IdNode myExpId = (IdNode) myExp;
+        String name = myExpId.getIdValue();
         SemSym symbol = symTable.lookupGlobal(name);
         if (symbol == null) {
           ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
         }
-        myExp.setSymbol(symbol);
+        myExpId.setSymbol(symbol);
+      } catch (ClassCastException ex) {
+        //not an exp, so move on.
       }
     }
 
@@ -888,14 +913,6 @@ class FalseNode extends ExpNode {
 
 class IdNode extends ExpNode {
 
-    //constructor method if IdNode is used (not declared)
-    public IdNode(int lineNum, int charNum, String strVal, SemSym link) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
-        myStrVal = strVal;
-	      symbol = link;
-    }
-
    //constructor method if IdNode is a declaration.
     public IdNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
@@ -934,9 +951,9 @@ class DotAccessExpNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myLoc.unparse(p, 0);
-		p.print(").");
-		myId.unparse(p, 0);
+		  myLoc.unparse(p, 0);
+		  p.print(").");
+		  myId.unparse(p, 0);
     }
 
     public void nameAnalysis(SymTable symbolTable) {
@@ -991,6 +1008,7 @@ class CallExpNode extends ExpNode {
         myExpList = new ExpListNode(new LinkedList<ExpNode>());
     }
 
+<<<<<<< HEAD
     public IdNode getIdNode(){
 	return myId;
     }
@@ -1000,6 +1018,8 @@ class CallExpNode extends ExpNode {
     }
 
     // ** unparse **
+=======
+>>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
     public void unparse(PrintWriter p, int indent) {
 	    myId.unparse(p, 0);
 		  p.print("(");
@@ -1019,6 +1039,21 @@ abstract class UnaryExpNode extends ExpNode {
         myExp = exp;
     }
 
+    public void nameAnalysis(SymTable symbolTable){
+          try {
+            IdNode expId = (IdNode) myExp;
+            String name = expId.getIdValue();
+            SemSym symbol = symbolTable.lookupGlobal(name);
+            if(symbol == null) {
+              ErrMsg.fatal(exp.myLineNum, exp.myCharNum, "Undeclared identifier");
+            }
+            exp.setSymbol(symbol);
+          } catch (ClassCastException ex) {
+            //Is not an IdNode so move on
+          }
+        }
+    }
+
     // one child
     protected ExpNode myExp;
 }
@@ -1030,21 +1065,22 @@ abstract class BinaryExpNode extends ExpNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-      if (myExp1 instanceof IdNode) {
-        String name = myExp1.getIdValue();
+        nameAnalysis(symbolTable, myExp1);
+        nameAnalysis(symbolTable, myExp2);
+
+    }
+
+    private void nameAnalysis(SymTable symbolTable, ExpNode myExp){
+      try{
+        IdNode myExpId = (IdNode) myExp;
+        String name = myExpId.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null) {
-          ErrMsg.fatal(myExp1.myLineNum, myExp1.myCharNum, "Undeclared identifier");
+          ErrMsg.fatal(myExpId.myLineNum, myExpId.myCharNum, "Undeclared identifier");
         }
-        myExp1.setSymbol(symbol);
-      }
-      if (myExp2 instanceof IdNode) {
-        String name = myExp1.getIdValue();
-        SemSym symbol = symbolTable.lookupGlobal(name);
-        if(symbol == null) {
-          ErrMsg.fatal(myExp2.myLineNum, myExp2.myCharNum, "Undeclared identifier");
-        }
-        myExp2.setSymbol(symbol);
+        myExpId.setSymbol(symbol);
+      } catch (ClassCastException ex) {
+        //exp is not an IdNode, move on
       }
     }
 
@@ -1060,17 +1096,6 @@ abstract class BinaryExpNode extends ExpNode {
 class UnaryMinusNode extends UnaryExpNode {
     public UnaryMinusNode(ExpNode exp) {
         super(exp);
-    }
-
-    public void nameAnalysis(SymTable symbolTable){
-        if(exp instanceof IdNode) {
-          String name = exp.getIdValue();
-          SemSym symbol = symbolTable.lookupGlobal(name);
-          if(symbol == null) {
-            ErrMsg.fatal(exp.myLineNum, exp.myCharNum, "Undeclared identifier");
-          }
-          exp.setSymbol(symbol);
-        }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1114,8 +1139,6 @@ class MinusNode extends BinaryExpNode {
     public MinusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
-
-
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
