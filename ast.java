@@ -140,6 +140,7 @@ class ProgramNode extends ASTnode {
         myDeclList.nameAnalysis(symTab);
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
+        symTab.removeScope();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -212,8 +213,10 @@ class FnBodyNode extends ASTnode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
+      symbolTable.addScope();
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
+      symbolTable.removeScope();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -385,6 +388,7 @@ class StructDeclNode extends DeclNode {
     }
 
     public void nameAnalysis() {
+
 
     }
 
