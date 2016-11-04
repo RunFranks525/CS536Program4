@@ -475,7 +475,7 @@ class AssignStmtNode extends StmtNode {
         myAssign = assign;
     }
 
-    public void nameAnalysis(SymbolTable symbolTable){
+    public void nameAnalysis(SymTable symbolTable){
       ExpNode lhsId = myAssign.getLhs();
       ExpNode expId = myAssign.getExp();
       if(lhsId instanceof IdNode){
@@ -747,7 +747,7 @@ class ReturnStmtNode extends StmtNode {
         myExp = exp;
     }
 
-    public void nameAnalysis(SymbolTable symTable) {
+    public void nameAnalysis(SymTable symTable) {
       //Do we exit a scope here?
       if(myExp instanceof IdNode) {
         String name = myExp.getIdValue();
@@ -971,7 +971,7 @@ abstract class BinaryExpNode extends ExpNode {
         myExp2 = exp2;
     }
 
-    public void nameAnalysis(SymbolTable symbolTable) {
+    public void nameAnalysis(SymTable symbolTable) {
       if (myExp1 instanceof IdNode) {
         String name = myExp1.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
@@ -1004,7 +1004,7 @@ class UnaryMinusNode extends UnaryExpNode {
         super(exp);
     }
 
-    public void nameAnalysis(SymbolTable symbolTable){
+    public void nameAnalysis(SymTable symbolTable){
         IdNode expIdNode = (IdNode) exp;
         if(exp instanceof IdNode) {
           String name = myExp1.getIdValue();
@@ -1058,7 +1058,7 @@ class MinusNode extends BinaryExpNode {
         super(exp1, exp2);
     }
 
-    
+
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
