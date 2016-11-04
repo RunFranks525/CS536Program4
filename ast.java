@@ -488,35 +488,7 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-<<<<<<< HEAD
-      ExpNode lhsId = myAssign.getLhs();
-      ExpNode expId = myAssign.getExp();
-      if(lhsId instanceof IdNode){
 
-
-
-
-
-	///!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	///TODO: DECIDE IF THIS IS VERY VERY WRONG OR IF IT'S OKAY
-	IdNode lhsIdNode = (IdNode)lhsId;
-
-
-
-
-        String name = lhsIdNode.getIdValue();
-        SemSym symbol = symbolTable.lookupGlobal(name);
-        if(symbol == null){
-          //no entry in the table
-          ErrMsg.fatal(lhsIdNode.myLlineNum, lhsIdNode.myCharNum, "Use of an undeclared identifier");
-        }
-        //when do we use global over local?
-        lhsIdNode.setSymbol(symbol);
-      }
-      if(expId instanceof IdNode){
-        String name = expId.getIdValue();
-=======
       nameAnalysis(symbolTable, myAssign.getLhs());
       nameAnalysis(symbolTable, myAssign.getExp());
     }
@@ -525,7 +497,6 @@ class AssignStmtNode extends StmtNode {
       try{
         IdNode myExpId = (IdNode) myExp;
         String name = myExpId.getIdValue();
->>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null) {
           ErrMsg.fatal(myExpId.myLineNum, myExpId.myCharNum, "Undeclared identifier");
@@ -790,15 +761,9 @@ class CallStmtNode extends StmtNode {
         myCall = call;
     }
 
-<<<<<<< HEAD
-    abstract void nameAnalysis(SymTable symbolTable){
-	IdNode callId = myCall.getIdNode();
-	ExpListNode callExp = myCall.getExpListNode();
-=======
-    public void nameAnalysis(SymTable symbolTable) {
-      //name analysis on the CallStmtNode
-      String name =
->>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
+    public void nameAnalysis(SymTable symbolTable){
+	    IdNode callId = myCall.getIdNode();
+	    ExpListNode callExp = myCall.getExpListNode();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -961,7 +926,7 @@ class DotAccessExpNode extends ExpNode {
 	if(symbolTable.lookupGlobal(myId.getIdVal) == null){
 		ErrMsg.fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
 	}
-	
+
     }
 
     // 2 kids
@@ -1008,18 +973,15 @@ class CallExpNode extends ExpNode {
         myExpList = new ExpListNode(new LinkedList<ExpNode>());
     }
 
-<<<<<<< HEAD
     public IdNode getIdNode(){
-	return myId;
+	    return myId;
     }
 
     public ExpListNode getExpListNode(){
-	return myExpList;
+	    return myExpList;
     }
 
     // ** unparse **
-=======
->>>>>>> Removing instanceof usage and casting our ExpNodes to IdNodes
     public void unparse(PrintWriter p, int indent) {
 	    myId.unparse(p, 0);
 		  p.print("(");
