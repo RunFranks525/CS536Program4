@@ -286,8 +286,8 @@ class VarDeclNode extends DeclNode {
 	}
 =======
 	      String varIdValue = myId.getIdValue();
-	      SemSym varSymValue = myId.getSymbol();
-	      if(myType instanceof VoidNode) {
+	      SemSym varSymValue = new SemSym(myType.getTypeString());
+	      if(varSymValue.getType().equals("void")) {
 		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
 	      } else {
 	         try {
@@ -328,7 +328,7 @@ class FnDeclNode extends DeclNode {
 
     public void nameAnalysis(SymTable symbolTable) {
         String fnIdValue = myId.getIdValue();
-        SemSym fnSymValue = myId.getSymbol();
+        SemSym fnSymValue = new SemSym(myType.getTypeString());
         try{
           symbolTable.addDecl(fnIdValue, fnSymValue);
   	    } catch(DuplicateSymException ex) {
@@ -363,8 +363,8 @@ class FormalDeclNode extends DeclNode {
 
      public void nameAnalysis(SymTable symbolTable) {
         String formalIdValue = myId.getIdValue();
-        SemSym formalSymValue = myId.getSymbol();
-	      if (myType instanceof VoidNode) {
+        SemSym formalSymValue = new SemSym(myType.getTypeString());
+	      if (formalSymValue.getType().equals("void")) {
 		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
 	      } else {
 		        try{
@@ -405,7 +405,6 @@ class StructDeclNode extends DeclNode {
         myDeclList.unparse(p, indent+4);
         doIndent(p, indent);
         p.println("};\n");
-
     }
 
     // 2 kids
@@ -418,6 +417,7 @@ class StructDeclNode extends DeclNode {
 // **********************************************************************
 
 abstract class TypeNode extends ASTnode {
+  abstract public String getTypeString();
 }
 
 class IntNode extends TypeNode {
@@ -426,6 +426,10 @@ class IntNode extends TypeNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print("int");
+    }
+
+    public String getTypeString(){
+      return "int";
     }
 }
 
@@ -436,6 +440,10 @@ class BoolNode extends TypeNode {
     public void unparse(PrintWriter p, int indent) {
         p.print("bool");
     }
+
+    public String getTypeString(){
+      return "bool";
+    }
 }
 
 class VoidNode extends TypeNode {
@@ -444,6 +452,10 @@ class VoidNode extends TypeNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print("void");
+    }
+
+    public String getTypeString(){
+      return "void";
     }
 }
 
@@ -455,6 +467,10 @@ class StructNode extends TypeNode {
     public void unparse(PrintWriter p, int indent) {
         p.print("struct ");
 		    myId.unparse(p, 0);
+    }
+
+    public String getTypeString(){
+      return "struct";
     }
 
 	// 1 kid
@@ -480,12 +496,17 @@ class AssignStmtNode extends StmtNode {
       if(lhsId instanceof IdNode){
         String name = lhsId.getIdValue();
         Symbol symbol = symbolTable.lookupGlobal(name);
+        if(symbol == null){
+          //no entry in the table
+          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        }
         //when do we use global over local?
         lhsId.setSymbol(symbol);
       }
       if(expId instanceof IdNode){
         String name = expId.getIdValue();
         Symbol symbol = symbolTable.lookupGlobal(name);
+        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
         expId.setSymbol(symbol);
       }
     }
@@ -507,7 +528,12 @@ class PostIncStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post incrementing an int
-      myExp.nameAnalysis(symbolTable);
+      String name = myExp.getIdValue();
+      Symbol symbol = SymTable.lookupGlobal(name);
+      if (symbol == null) {
+        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+      }
+      myExp.setSymbol(symbol);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -527,7 +553,12 @@ class PostDecStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post decrementing an int
-      myExp.nameAnalysis();
+      String name = myExp.getIdValue();
+      Symbol symbol = SymTable.lookupGlobal(name);
+      if (symbol == null) {
+        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+      }
+      myExp.setSymbol(symbol);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -546,7 +577,12 @@ class ReadStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-
+      String name = myExp.getIdValue();
+      Symbol symbol = SymTable.lookupGlobal(name);
+      if (symbol == null) {
+        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+      }
+      myExp.setSymbol(symbol);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -566,7 +602,12 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-
+      String name = myExp.getIdValue();
+      Symbol symbol = SymTable.lookupGlobal(name);
+      if (symbol == null) {
+        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+      }
+      myExp.setSymbol(symbol);
     }
 
     public void unparse(PrintWriter p, int indent) {
