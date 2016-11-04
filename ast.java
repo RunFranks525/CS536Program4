@@ -246,6 +246,24 @@ class ExpListNode extends ASTnode {
         myExps = S;
     }
 
+    public void nameAnalysis(SymTable symbolTable){
+	
+      for(ExpNode eNode : myExps){
+        try{
+		IdNode iNode = (IdNode)eNode;
+		if(symbolTable.lookupGlobal(iNode.getIdVal) == null)
+			ErrMsg.fatal(iNode.lineNum, iNode.charNum, "Undeclared Identifier");
+
+		//TODO: Add any more checks for errors here
+
+	}
+	catch(ClassCastException ex){
+
+	}
+      }
+
+    }
+
     public void unparse(PrintWriter p, int indent) {
         Iterator<ExpNode> it = myExps.iterator();
         if (it.hasNext()) { // if there is at least one element
@@ -505,6 +523,7 @@ class AssignStmtNode extends StmtNode {
       } catch (ClassCastException ex) {
         //exp is not an IdNode, move on
       }
+    }
 
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
@@ -1013,7 +1032,8 @@ abstract class UnaryExpNode extends ExpNode {
           } catch (ClassCastException ex) {
             //Is not an IdNode so move on
           }
-        }
+        
+
     }
 
     // one child
