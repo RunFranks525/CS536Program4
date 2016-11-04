@@ -912,6 +912,13 @@ class DotAccessExpNode extends ExpNode {
         myId = id;
     }
 
+    public void nameAnalysis(SymTable symbolTable){
+
+	myId.nameAnalysis(symbolTable);
+	myLoc.nameAnalysis(symbolTable);
+
+    }
+
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
 		  myLoc.unparse(p, 0);
@@ -919,13 +926,10 @@ class DotAccessExpNode extends ExpNode {
 		  myId.unparse(p, 0);
     }
 
-    public void nameAnalysis(SymTable symbolTable) {
-	     if(symbolTable.lookupGlobal(myId.getIdVal) == null){
-		      ErrMsg.fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
-	     }
+
 
     }
-
+B
     // 2 kids
     private ExpNode myLoc;
     private IdNode myId;
