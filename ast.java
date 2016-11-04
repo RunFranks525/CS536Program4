@@ -929,7 +929,7 @@ class DotAccessExpNode extends ExpNode {
 
 
     }
-B
+
     // 2 kids
     private ExpNode myLoc;
     private IdNode myId;
