@@ -486,18 +486,10 @@ class AssignStmtNode extends StmtNode {
       ExpNode expId = myAssign.getExp();
       if(lhsId instanceof IdNode){
 
-
-
-
-
 	///!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	///TODO: DECIDE IF THIS IS VERY VERY WRONG OR IF IT'S OKAY
 	IdNode lhsIdNode = (IdNode)lhsId;
-
-
-
-
         String name = lhsIdNode.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null){
