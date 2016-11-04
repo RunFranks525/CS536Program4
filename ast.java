@@ -1058,7 +1058,7 @@ class MinusNode extends BinaryExpNode {
         super(exp1, exp2);
     }
 
-    public void
+    
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
