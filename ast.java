@@ -491,7 +491,9 @@ class AssignStmtNode extends StmtNode {
       if(expId instanceof IdNode){
         String name = expId.getIdValue();
         Symbol symbol = symbolTable.lookupGlobal(name);
-        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        if (symbol == null) {
+          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        }
         expId.setSymbol(symbol);
       }
     }
@@ -651,13 +653,16 @@ class IfElseStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable) {
 	     //need to add a scope for both the if block and the else block
+       symbolTable.addScope();
        nameAnalysis(symbolTable, myThenDeclList, myThenStmtList);
+       symbolTable.removeScope();
+       symbolTable.addScope();
        nameAnalysis(symbolTable, myElseDeclList, myElseStmtList);
+       symbolTable.removeScope();
     }
 
     private void nameAnalysis(SymTable symbolTable, DeclListNode myDeclList, StmtListNode myStmtList) {
       //private function helper that adds a scope for the blocks, does name analysis decls and stmts
-      symbolTable.addScope();
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
     }
@@ -700,6 +705,8 @@ class WhileStmtNode extends StmtNode {
 	     //need to do name analysis on the decl's and the stmt's
        myDeclList.nameAnalysis(symbolTable);
        myStmtList.nameAnalysis(symbolTable);
+       //once done with analysis, remove the current scope
+       symbolTable.removeScope();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -964,6 +971,25 @@ abstract class BinaryExpNode extends ExpNode {
         myExp2 = exp2;
     }
 
+    public void nameAnalysis(SymbolTable symbolTable) {
+      if (myExp1 instanceof IdNode) {
+        String name = myExp1.getIdValue();
+        SemSym symbol = symbolTable.lookupGlobal(name);
+        if(symbol == null) {
+          fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+        }
+        myExp1.setSymbol(symbol);
+      }
+      if (myExp2 instanceof IdNode) {
+        String name = myExp1.getIdValue();
+        SemSym symbol = symbolTable.lookupGlobal(name);
+        if(symbol == null) {
+          fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+        }
+        myExp2.setSymbol(symbol);
+      }
+    }
+
     // two kids
     protected ExpNode myExp1;
     protected ExpNode myExp2;
@@ -978,10 +1004,22 @@ class UnaryMinusNode extends UnaryExpNode {
         super(exp);
     }
 
+    public void nameAnalysis(SymbolTable symbolTable){
+        IdNode expIdNode = (IdNode) exp;
+        if(exp instanceof IdNode) {
+          String name = myExp1.getIdValue();
+          SemSym symbol = symbolTable.lookupGlobal(name);
+          if(symbol == null) {
+            fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+          }
+          exp.setSymbol(symbol);
+        }
+    }
+
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(-");
-		myExp.unparse(p, 0);
-		p.print(")");
+		  myExp.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -992,8 +1030,8 @@ class NotNode extends UnaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(!");
-		myExp.unparse(p, 0);
-		p.print(")");
+		  myExp.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1019,6 +1057,8 @@ class MinusNode extends BinaryExpNode {
     public MinusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+
+    public void
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
