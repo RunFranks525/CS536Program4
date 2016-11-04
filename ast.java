@@ -749,7 +749,8 @@ class WhileStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symbolTable) {
 	try{
 		IdNode myExpId = (IdNode)myExp;
-		myExpId.nameAnalysis(symbolTable);
+		if(symbolTable.lookupGlobal(myExpId.getIdValue()) == null)
+			ErrMsg.fatal(myExpId.myLineNum, myExpId.myCharNum, "Undeclared Identifier");
 	} catch(ClassCastException ex){
 
 	}
@@ -1033,7 +1034,7 @@ abstract class UnaryExpNode extends ExpNode {
             if(symbol == null) {
               ErrMsg.fatal(expId.myLineNum, expId.myCharNum, "Undeclared identifier");
             }
-            exp.setSymbol(symbol);
+            expId.setSymbol(symbol);
           } catch (ClassCastException ex) {
             //Is not an IdNode so move on
           }
