@@ -15,7 +15,7 @@ public class SemSym {
 }
 
 public class StructSym extends SemSym{
-
+	@Override
 	private HashMap<String, SemSym> fields;
 	
 	public StructSym(String type) {
@@ -49,7 +49,7 @@ public class FuncSym extends SemSym{
 		args.add(symbol);
 	}
 
-	public void numArgs(){
+	public int numArgs(){
 		return args.size();
 	}
 

@@ -855,7 +855,9 @@ class IdNode extends ExpNode {
     }
 
     public int getIdPosition() {
-      return new int[]{this.myLineNum, this.myCharNum};
+
+      return new int[]{myLineNum, myCharNum};
+
     }
 
     public void setSymbol(SemSym symbol) {
@@ -886,6 +888,13 @@ class DotAccessExpNode extends ExpNode {
 		  p.print(").");
 		  myId.unparse(p, 0);
     }
+<<<<<<< HEAD
+=======
+
+
+
+    
+>>>>>>> didn't change much with SemSym
 
     // 2 kids
     private ExpNode myLoc;
