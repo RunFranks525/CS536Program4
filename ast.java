@@ -274,12 +274,12 @@ class VarDeclNode extends DeclNode {
 	      String varIdValue = myId.getIdValue();
 	      SemSym varSymValue = new SemSym(myType.getTypeString());
 	      if(varSymValue.getType().equals("void")) {
-		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+		        fatal(myId.myLineNum, myId.myCharNum, "Non-function declared void");
 	      } else {
 	         try {
              symbolTable.addDecl(varIdValue, varSymValue);
            } catch (DuplicateSymException ex) {
-		           fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+		           fatal(myId.myLineNum, myId.myCharNum, "Multiply declared identifier");
   	       }
 	     }
     }
@@ -317,7 +317,7 @@ class FnDeclNode extends DeclNode {
         try{
           symbolTable.addDecl(fnIdValue, fnSymValue);
   	    } catch(DuplicateSymException ex) {
-  		      fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+  		      fatal(myId.myLineNum, myId.myCharNum, "Multiply declared identifier");
   	    }
     }
 
@@ -350,13 +350,13 @@ class FormalDeclNode extends DeclNode {
         String formalIdValue = myId.getIdValue();
         SemSym formalSymValue = new SemSym(myType.getTypeString());
 	      if (formalSymValue.getType().equals("void")) {
-		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+		        fatal(myId.myLineNum, myId.myCharNum, "Non-function declared void");
 	      } else {
 		        try{
 			           symbolTable.addDecl(formalIdValue, formalSymValue);
 		        }
 		        catch(DuplicateSymException e){
-			           fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+			           fatal(myId.myLineNum, myId.myCharNum, "Multiply declared identifier");
 		        }
 	      }
      }
@@ -483,7 +483,7 @@ class AssignStmtNode extends StmtNode {
         Symbol symbol = symbolTable.lookupGlobal(name);
         if(symbol == null){
           //no entry in the table
-          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+          fatal(lhsId.lineNum, lhsId.charNum, "Use of an undeclared identifier");
         }
         //when do we use global over local?
         lhsId.setSymbol(symbol);
@@ -492,7 +492,7 @@ class AssignStmtNode extends StmtNode {
         String name = expId.getIdValue();
         Symbol symbol = symbolTable.lookupGlobal(name);
         if (symbol == null) {
-          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+          fatal(expId.lineNum, expId.charNum, "Use of an undeclared identifier");
         }
         expId.setSymbol(symbol);
       }
@@ -518,7 +518,7 @@ class PostIncStmtNode extends StmtNode {
       String name = myExp.getIdValue();
       Symbol symbol = SymTable.lookupGlobal(name);
       if (symbol == null) {
-        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
       myExp.setSymbol(symbol);
     }
@@ -543,7 +543,7 @@ class PostDecStmtNode extends StmtNode {
       String name = myExp.getIdValue();
       Symbol symbol = SymTable.lookupGlobal(name);
       if (symbol == null) {
-        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
       myExp.setSymbol(symbol);
     }
@@ -567,7 +567,7 @@ class ReadStmtNode extends StmtNode {
       String name = myExp.getIdValue();
       Symbol symbol = SymTable.lookupGlobal(name);
       if (symbol == null) {
-        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
       myExp.setSymbol(symbol);
     }
@@ -592,7 +592,7 @@ class WriteStmtNode extends StmtNode {
       String name = myExp.getIdValue();
       Symbol symbol = SymTable.lookupGlobal(name);
       if (symbol == null) {
-        fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
       myExp.setSymbol(symbol);
     }
@@ -753,7 +753,7 @@ class ReturnStmtNode extends StmtNode {
         String name = myExp.getIdValue();
         Symbol symbol = symTable.lookupGlobal(name);
         if (symbol == null) {
-          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+          fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
         }
         myExp.setSymbol(symbol);
       }
@@ -874,8 +874,8 @@ class IdNode extends ExpNode {
       return this.myStrVal;
     }
 
-    private int myLineNum;
-    private int myCharNum;
+    public int myLineNum;
+    public int myCharNum;
     private String myStrVal;
     private SemSym symbol;
 }
@@ -976,7 +976,7 @@ abstract class BinaryExpNode extends ExpNode {
         String name = myExp1.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null) {
-          fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+          fatal(myExp1.myLineNum, myExp1.myCharNum, "Undeclared identifier");
         }
         myExp1.setSymbol(symbol);
       }
@@ -984,7 +984,7 @@ abstract class BinaryExpNode extends ExpNode {
         String name = myExp1.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null) {
-          fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+          fatal(myExp2.myLineNum, myExp2.myCharNum, "Undeclared identifier");
         }
         myExp2.setSymbol(symbol);
       }
@@ -1005,12 +1005,11 @@ class UnaryMinusNode extends UnaryExpNode {
     }
 
     public void nameAnalysis(SymTable symbolTable){
-        IdNode expIdNode = (IdNode) exp;
         if(exp instanceof IdNode) {
-          String name = myExp1.getIdValue();
+          String name = exp.getIdValue();
           SemSym symbol = symbolTable.lookupGlobal(name);
           if(symbol == null) {
-            fatal(myId.lineNum, myId.charNum, "Undeclared identifier");
+            fatal(exp.myLineNum, exp.myCharNum, "Undeclared identifier");
           }
           exp.setSymbol(symbol);
         }
