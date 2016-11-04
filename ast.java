@@ -480,7 +480,7 @@ class AssignStmtNode extends StmtNode {
       ExpNode expId = myAssign.getExp();
       if(lhsId instanceof IdNode){
         String name = lhsId.getIdValue();
-        Symbol symbol = symbolTable.lookupGlobal(name);
+        SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null){
           //no entry in the table
           ErrMsg.fatal(lhsId.lineNum, lhsId.charNum, "Use of an undeclared identifier");
@@ -490,7 +490,7 @@ class AssignStmtNode extends StmtNode {
       }
       if(expId instanceof IdNode){
         String name = expId.getIdValue();
-        Symbol symbol = symbolTable.lookupGlobal(name);
+        SemSym symbol = symbolTable.lookupGlobal(name);
         if (symbol == null) {
           ErrMsg.fatal(expId.lineNum, expId.charNum, "Use of an undeclared identifier");
         }
@@ -516,7 +516,7 @@ class PostIncStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post incrementing an int
       String name = myExp.getIdValue();
-      Symbol symbol = SymTable.lookupGlobal(name);
+      SemSym symbol = symbolTable.lookupGlobal(name);
       if (symbol == null) {
         fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
@@ -541,7 +541,7 @@ class PostDecStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symbolTable) {
       //need to check that we are post decrementing an int
       String name = myExp.getIdValue();
-      Symbol symbol = SymTable.lookupGlobal(name);
+      SemSym symbol = symbolTable.lookupGlobal(name);
       if (symbol == null) {
         ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
@@ -565,7 +565,7 @@ class ReadStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable){
       String name = myExp.getIdValue();
-      Symbol symbol = SymTable.lookupGlobal(name);
+      SemSym symbol = symbolTable.lookupGlobal(name);
       if (symbol == null) {
         ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
@@ -590,7 +590,7 @@ class WriteStmtNode extends StmtNode {
 
     public void nameAnalysis(SymTable symbolTable){
       String name = myExp.getIdValue();
-      Symbol symbol = SymTable.lookupGlobal(name);
+      SemSym symbol = symbolTable.lookupGlobal(name);
       if (symbol == null) {
         ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
       }
@@ -751,7 +751,7 @@ class ReturnStmtNode extends StmtNode {
       //Do we exit a scope here?
       if(myExp instanceof IdNode) {
         String name = myExp.getIdValue();
-        Symbol symbol = symTable.lookupGlobal(name);
+        SemSym symbol = symTable.lookupGlobal(name);
         if (symbol == null) {
           ErrMsg.fatal(myExp.myLineNum, myExp.myCharNum, "Use of an undeclared identifier");
         }

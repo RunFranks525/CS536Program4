@@ -5,7 +5,7 @@
  */
 class ErrMsg {
 
-    static bool foundFatal = FALSE;
+    private static Boolean  foundFatal = FALSE;
     /**
      * Generates a fatal error message.
      * @param lineNum line number for error location
