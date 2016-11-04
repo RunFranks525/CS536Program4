@@ -271,6 +271,7 @@ class VarDeclNode extends DeclNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
+<<<<<<< HEAD
 	String varIdValue = "";
 	SemSym varSymValue = null;
 	if(myType instanceof VoidNode) {
@@ -283,6 +284,19 @@ class VarDeclNode extends DeclNode {
 			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
 		}
 	}
+=======
+	      String varIdValue = myId.getIdValue();
+	      SemSym varSymValue = myId.getSymbol();
+	      if(myType instanceof VoidNode) {
+		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+	      } else {
+	         try {
+             symbolTable.addDecl(varIdValue, varSymValue);
+           } catch (DuplicateSymException ex) {
+		           fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+  	       }
+	     }
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -313,13 +327,13 @@ class FnDeclNode extends DeclNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-        String fnIdValue = "";
+        String fnIdValue = myId.getIdValue();
         SemSym fnSymValue = myId.getSymbol();
-	      try{
+        try{
           symbolTable.addDecl(fnIdValue, fnSymValue);
-	      } catch(DuplicateSymException ex) {
-		        fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
-	      }
+  	    } catch(DuplicateSymException ex) {
+  		      fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+  	    }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -348,18 +362,18 @@ class FormalDeclNode extends DeclNode {
     }
 
      public void nameAnalysis(SymTable symbolTable) {
-        String formalIdValue = "";
-        SemSym formalSymValue = null;
-	if (myType instanceof VoidNode) {
-		fatal(myId.lineNum, myId.charNum, "Non-function declared void");
-	} else {
-		try{
-			symbolTable.addDecl(formalIdValue, formalSymValue);
-		}
-		catch(DuplicateSymException e){
-			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
-		}
-	}
+        String formalIdValue = myId.getIdValue();
+        SemSym formalSymValue = myId.getSymbol();
+	      if (myType instanceof VoidNode) {
+		        fatal(myId.lineNum, myId.charNum, "Non-function declared void");
+	      } else {
+		        try{
+			           symbolTable.addDecl(formalIdValue, formalSymValue);
+		        }
+		        catch(DuplicateSymException e){
+			           fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
+		        }
+	      }
      }
 
     public void unparse(PrintWriter p, int indent) {
@@ -386,8 +400,8 @@ class StructDeclNode extends DeclNode {
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("struct ");
-		myId.unparse(p, 0);
-		p.println("{");
+		    myId.unparse(p, 0);
+		    p.println("{");
         myDeclList.unparse(p, indent+4);
         doIndent(p, indent);
         p.println("};\n");
@@ -396,7 +410,7 @@ class StructDeclNode extends DeclNode {
 
     // 2 kids
     private IdNode myId;
-	private DeclListNode myDeclList;
+	  private DeclListNode myDeclList;
 }
 
 // **********************************************************************
@@ -435,12 +449,12 @@ class VoidNode extends TypeNode {
 
 class StructNode extends TypeNode {
     public StructNode(IdNode id) {
-		myId = id;
+		    myId = id;
     }
 
     public void unparse(PrintWriter p, int indent) {
         p.print("struct ");
-		myId.unparse(p, 0);
+		    myId.unparse(p, 0);
     }
 
 	// 1 kid
@@ -452,11 +466,28 @@ class StructNode extends TypeNode {
 // **********************************************************************
 
 abstract class StmtNode extends ASTnode {
+
 }
 
 class AssignStmtNode extends StmtNode {
     public AssignStmtNode(AssignNode assign) {
         myAssign = assign;
+    }
+
+    public void nameAnalysis(SymbolTable symbolTable){
+      ExpNode lhsId = myAssign.getLhs();
+      ExpNode expId = myAssign.getExp();
+      if(lhsId instanceof IdNode){
+        String name = lhsId.getIdValue();
+        Symbol symbol = symbolTable.lookupGlobal(name);
+        //when do we use global over local?
+        lhsId.setSymbol(symbol);
+      }
+      if(expId instanceof IdNode){
+        String name = expId.getIdValue();
+        Symbol symbol = symbolTable.lookupGlobal(name);
+        expId.setSymbol(symbol);
+      }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -474,6 +505,11 @@ class PostIncStmtNode extends StmtNode {
         myExp = exp;
     }
 
+    public void nameAnalysis(SymTable symbolTable) {
+      //need to check that we are post incrementing an int
+      myExp.nameAnalysis(symbolTable);
+    }
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         myExp.unparse(p, 0);
@@ -487,6 +523,11 @@ class PostIncStmtNode extends StmtNode {
 class PostDecStmtNode extends StmtNode {
     public PostDecStmtNode(ExpNode exp) {
         myExp = exp;
+    }
+
+    public void nameAnalysis(SymTable symbolTable) {
+      //need to check that we are post decrementing an int
+      myExp.nameAnalysis();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -504,6 +545,10 @@ class ReadStmtNode extends StmtNode {
         myExp = e;
     }
 
+    public void nameAnalysis(SymTable symbolTable){
+
+    }
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("cin >> ");
@@ -518,6 +563,10 @@ class ReadStmtNode extends StmtNode {
 class WriteStmtNode extends StmtNode {
     public WriteStmtNode(ExpNode exp) {
         myExp = exp;
+    }
+
+    public void nameAnalysis(SymTable symbolTable){
+
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -539,6 +588,7 @@ class IfStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
+<<<<<<< HEAD
 	//Do name Analysis for the expression being observed in the if statement	
 	myExp.nameAnalysis(symbolTable);
 	//need to add a scope for the if block
@@ -548,6 +598,13 @@ class IfStmtNode extends StmtNode {
 	myStmtList.nameAnalysis(symbolTable);
 	//done with scope, so you can remove the scope now
 	symbolTable.removeScope();
+=======
+	     //need to add a scope for the if block
+	     symbolTable.addScope();
+	     //Do name analysis on the decl's and the stmt's
+       myDeclList.nameAnalysis(symbolTable);
+       myStmtList.nameAnalysis(symbolTable);
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -579,6 +636,7 @@ class IfElseStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
+<<<<<<< HEAD
 	//do name analysis of expression at current scope level
 	myExp.nameAnalysis(symbolTable);
 	//add a scope for THEN block
@@ -597,6 +655,18 @@ class IfElseStmtNode extends StmtNode {
 	//remove scope for ELSE block
 	symbolTable.removeScope();
 	
+=======
+	     //need to add a scope for both the if block and the else block
+       nameAnalysis(symbolTable, myThenDeclList, myThenStmtList);
+       nameAnalysis(symbolTable, myElseDeclList, myElseStmtList);
+    }
+
+    private void nameAnalysis(SymTable symbolTable, DeclListNode myDeclList, StmtListNode myStmtList) {
+      //private function helper that adds a scope for the blocks, does name analysis decls and stmts
+      symbolTable.addScope();
+      myDeclList.nameAnalysis(symbolTable);
+      myStmtList.nameAnalysis(symbolTable);
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -632,6 +702,7 @@ class WhileStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
+<<<<<<< HEAD
 	//name analysis on Expr
 	myExp.nameAnalysis(symbolTable);
 	//need to add a scope
@@ -641,6 +712,13 @@ class WhileStmtNode extends StmtNode {
 	myStmtList.nameAnalysis(symbolTable);
 	//remove scope for block
 	symbolTable.removeScope();
+=======
+	     //need to add a scope
+	     symbolTable.addScope();
+	     //need to do name analysis on the decl's and the stmt's
+       myDeclList.nameAnalysis(symbolTable);
+       myStmtList.nameAnalysis(symbolTable);
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -676,6 +754,7 @@ class CallStmtNode extends StmtNode {
 }
 
 class ReturnStmtNode extends StmtNode {
+  //Exit scope here?
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -808,6 +887,10 @@ class IdNode extends ExpNode {
       return this.symbol;
     }
 
+    public void setSymbol(SemSym symbol) {
+      this.symbol = symbol;
+    }
+
     public String getIdValue() {
       return this.myStrVal;
     }
@@ -835,6 +918,12 @@ class DotAccessExpNode extends ExpNode {
 		myId.unparse(p, 0);
     }
 
+<<<<<<< HEAD
+=======
+    public void nameAnalysis(SymTable symbolTable) {
+
+    }
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
 
     // 2 kids
     private ExpNode myLoc;
@@ -853,11 +942,19 @@ class AssignNode extends ExpNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
-		if (indent != -1)  p.print("(");
+		  if (indent != -1)  p.print("(");
 	    myLhs.unparse(p, 0);
-		p.print(" = ");
-		myExp.unparse(p, 0);
-		if (indent != -1)  p.print(")");
+		  p.print(" = ");
+		  myExp.unparse(p, 0);
+		  if (indent != -1)  p.print(")");
+    }
+
+    public ExpNode getLhs() {
+      return this.myLhs;
+    }
+
+    public ExpNode getExp() {
+      return this.myExp;
     }
 
     // 2 kids
@@ -883,11 +980,11 @@ class CallExpNode extends ExpNode {
     // ** unparse **
     public void unparse(PrintWriter p, int indent) {
 	    myId.unparse(p, 0);
-		p.print("(");
-		if (myExpList != null) {
-			myExpList.unparse(p, 0);
-		}
-		p.print(")");
+		  p.print("(");
+		  if (myExpList != null) {
+			     myExpList.unparse(p, 0);
+		  }
+		  p.print(")");
     }
 
     // 2 kids
@@ -962,10 +1059,10 @@ class PlusNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" + ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" + ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -976,10 +1073,10 @@ class MinusNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" - ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" - ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -990,10 +1087,10 @@ class TimesNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" * ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" * ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1004,10 +1101,10 @@ class DivideNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" / ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" / ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1018,10 +1115,10 @@ class AndNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" && ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" && ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1032,10 +1129,10 @@ class OrNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" || ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" || ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1046,10 +1143,10 @@ class EqualsNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" == ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" == ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1060,10 +1157,10 @@ class NotEqualsNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" != ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" != ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1074,10 +1171,10 @@ class LessNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" < ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" < ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1088,10 +1185,10 @@ class GreaterNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" > ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" > ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1099,13 +1196,12 @@ class LessEqNode extends BinaryExpNode {
     public LessEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
-
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" <= ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" <= ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
 }
 
@@ -1116,10 +1212,14 @@ class GreaterEqNode extends BinaryExpNode {
 
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
-		myExp1.unparse(p, 0);
-		p.print(" >= ");
-		myExp2.unparse(p, 0);
-		p.print(")");
+		  myExp1.unparse(p, 0);
+		  p.print(" >= ");
+		  myExp2.unparse(p, 0);
+		  p.print(")");
     }
+<<<<<<< HEAD
 }
 
+=======
+  }
+>>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
