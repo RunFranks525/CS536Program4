@@ -486,10 +486,18 @@ class AssignStmtNode extends StmtNode {
       ExpNode expId = myAssign.getExp();
       if(lhsId instanceof IdNode){
 
+
+
+
+
 	///!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	///TODO: DECIDE IF THIS IS VERY VERY WRONG OR IF IT'S OKAY
 	IdNode lhsIdNode = (IdNode)lhsId;
+
+
+
+
         String name = lhsIdNode.getIdValue();
         SemSym symbol = symbolTable.lookupGlobal(name);
         if(symbol == null){
@@ -627,7 +635,12 @@ class IfStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-	//TODO: determine if Exp Node contains an IdNode and if so, run nameAnalysis on it
+	try{
+		IdNode myExpId = (IdNode)myExp;
+		myExpId.nameAnalysis(symbolTable);
+	} catch(ClassCastException ex){
+
+	}
 
 	//need to add a scope for the if block
 	symbolTable.addScope();
@@ -666,7 +679,12 @@ class IfElseStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-	//TODO: determine if Exp Node contains an IdNode and if so, run nameAnalysis on it
+	try{
+		IdNode myExpId = (IdNode)myExp;
+		myExpId.nameAnalysis(symbolTable);
+	} catch(ClassCastException ex){
+
+	}
 
 	//need to add a scope for both the if block and the else block
        symbolTable.addScope();
@@ -716,7 +734,12 @@ class WhileStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-	//TODO: determine if Exp Node contains an IdNode and if so, run nameAnalysis on it
+	try{
+		IdNode myExpId = (IdNode)myExp;
+		myExpId.nameAnalysis(symbolTable);
+	} catch(ClassCastException ex){
+
+	}
 
      //need to add a scope
      symbolTable.addScope();
@@ -750,7 +773,8 @@ class CallStmtNode extends StmtNode {
     }
 
     abstract void nameAnalysis(SymTable symbolTable){
-	//TODO: implement this functionality!!!
+	IdNode callId = myCall.getIdNode();
+	ExpNode callExp = myCall.getExpNod();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -965,6 +989,14 @@ class CallExpNode extends ExpNode {
     public CallExpNode(IdNode name) {
         myId = name;
         myExpList = new ExpListNode(new LinkedList<ExpNode>());
+    }
+
+    public IdNode getIdNode(){
+	return myId;
+    }
+
+    public ExpListNode getExpListNode(){
+	return myExpList;
     }
 
     // ** unparse **
