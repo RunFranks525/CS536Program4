@@ -271,20 +271,6 @@ class VarDeclNode extends DeclNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-<<<<<<< HEAD
-	String varIdValue = "";
-	SemSym varSymValue = null;
-	if(myType instanceof VoidNode) {
-		fatal(myId.lineNum, myId.charNum, "Non-function declared void");
-	} else {
-		try{
-        		symbolTable.addDecl(varIdValue, varSymValue);
-		}
-    		catch (DuplicateSymException ex) {
-			fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
-		}
-	}
-=======
 	      String varIdValue = myId.getIdValue();
 	      SemSym varSymValue = new SemSym(myType.getTypeString());
 	      if(varSymValue.getType().equals("void")) {
@@ -296,7 +282,6 @@ class VarDeclNode extends DeclNode {
 		           fatal(myId.lineNum, myId.charNum, "Multiply declared identifier");
   	       }
 	     }
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -629,23 +614,11 @@ class IfStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-<<<<<<< HEAD
-	//Do name Analysis for the expression being observed in the if statement	
-	myExp.nameAnalysis(symbolTable);
-	//need to add a scope for the if block
-	symbolTable.addScope();
-	//Do name analysis on the decl's and the stmt's
-	myDeclList.nameAnalysis(symbolTable);
-	myStmtList.nameAnalysis(symbolTable);
-	//done with scope, so you can remove the scope now
-	symbolTable.removeScope();
-=======
 	     //need to add a scope for the if block
 	     symbolTable.addScope();
 	     //Do name analysis on the decl's and the stmt's
        myDeclList.nameAnalysis(symbolTable);
        myStmtList.nameAnalysis(symbolTable);
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -677,26 +650,6 @@ class IfElseStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-<<<<<<< HEAD
-	//do name analysis of expression at current scope level
-	myExp.nameAnalysis(symbolTable);
-	//add a scope for THEN block
-	symbolTable.addScope();
-	//do name analysis on THEN block
-	myThenDeclList.nameAnalysis(symbolTable);
-	myThenStmtList.nameAnalysis(symbolTable);
-	//remove scope for THEN block
-	symbolTable.removeScope();
-
-	//add scope for ELSE block
-	symbolTable.addScope();
-	//do name analysis on ELSE block
-	myElseDeclList.nameAnalysis(symbolTable);
-	myElseStmtList.nameAnalysis(symbolTable);
-	//remove scope for ELSE block
-	symbolTable.removeScope();
-	
-=======
 	     //need to add a scope for both the if block and the else block
        nameAnalysis(symbolTable, myThenDeclList, myThenStmtList);
        nameAnalysis(symbolTable, myElseDeclList, myElseStmtList);
@@ -707,7 +660,6 @@ class IfElseStmtNode extends StmtNode {
       symbolTable.addScope();
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -743,23 +695,11 @@ class WhileStmtNode extends StmtNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-<<<<<<< HEAD
-	//name analysis on Expr
-	myExp.nameAnalysis(symbolTable);
-	//need to add a scope
-	symbolTable.addScope();
-	//need to do name analysis on the decl's and the stmt's
-	myDeclList.nameAnalysis(symbolTable);
-	myStmtList.nameAnalysis(symbolTable);
-	//remove scope for block
-	symbolTable.removeScope();
-=======
 	     //need to add a scope
 	     symbolTable.addScope();
 	     //need to do name analysis on the decl's and the stmt's
        myDeclList.nameAnalysis(symbolTable);
        myStmtList.nameAnalysis(symbolTable);
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -800,6 +740,18 @@ class ReturnStmtNode extends StmtNode {
         myExp = exp;
     }
 
+    public void nameAnalysis(SymbolTable symTable) {
+      //Do we exit a scope here?
+      if(myExp instanceof IdNode) {
+        String name = myExp.getIdValue();
+        Symbol symbol = symTable.lookupGlobal(name);
+        if (symbol == null) {
+          fatal(myId.lineNum, myId.charNum, "Use of an undeclared identifier");
+        }
+        myExp.setSymbol(symbol);
+      }
+    }
+
     public void unparse(PrintWriter p, int indent) {
         doIndent(p, indent);
         p.print("return");
@@ -819,7 +771,6 @@ class ReturnStmtNode extends StmtNode {
 // **********************************************************************
 
 abstract class ExpNode extends ASTnode {
-    abstract void nameAnalysis(SymTable symboltable);
 }
 
 class IntLitNode extends ExpNode {
@@ -827,10 +778,6 @@ class IntLitNode extends ExpNode {
         myLineNum = lineNum;
         myCharNum = charNum;
         myIntVal = intVal;
-    }
-
-    public void nameAnalysis(SymTable symbolTablel){
-
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -849,10 +796,6 @@ class StringLitNode extends ExpNode {
         myStrVal = strVal;
     }
 
-    public void nameAnalysis(SymTable symbolTablel){
-
-    }
-
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
     }
@@ -868,10 +811,6 @@ class TrueNode extends ExpNode {
         myCharNum = charNum;
     }
 
-    public void nameAnalysis(SymTable symbolTablel){
-
-    }
-
     public void unparse(PrintWriter p, int indent) {
         p.print("true");
     }
@@ -884,10 +823,6 @@ class FalseNode extends ExpNode {
     public FalseNode(int lineNum, int charNum) {
         myLineNum = lineNum;
         myCharNum = charNum;
-    }
-
-    public void nameAnalysis(SymTable symbolTablel){
-
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -913,10 +848,6 @@ class IdNode extends ExpNode {
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
-    }
-
-    public void nameAnalysis(SymTable symbolTablel){
-
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -948,10 +879,6 @@ class DotAccessExpNode extends ExpNode {
         myId = id;
     }
 
-    public void nameAnalysis(SymTable symbolTablel){
-
-    }
-
     public void unparse(PrintWriter p, int indent) {
 	    p.print("(");
 		myLoc.unparse(p, 0);
@@ -959,12 +886,9 @@ class DotAccessExpNode extends ExpNode {
 		myId.unparse(p, 0);
     }
 
-<<<<<<< HEAD
-=======
     public void nameAnalysis(SymTable symbolTable) {
 
     }
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
 
     // 2 kids
     private ExpNode myLoc;
@@ -976,10 +900,6 @@ class AssignNode extends ExpNode {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
         myExp = exp;
-    }
-
-    public void nameAnalysis(SymTable symbolTablel){
-
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1014,10 +934,6 @@ class CallExpNode extends ExpNode {
         myExpList = new ExpListNode(new LinkedList<ExpNode>());
     }
 
-    public void nameAnalysis(SymTable symbolTablel){
-
-    }
-
     // ** unparse **
     public void unparse(PrintWriter p, int indent) {
 	    myId.unparse(p, 0);
@@ -1038,10 +954,6 @@ abstract class UnaryExpNode extends ExpNode {
         myExp = exp;
     }
 
-    public void nameAnalysis(SymTable symbolTablel){
-
-    }
-
     // one child
     protected ExpNode myExp;
 }
@@ -1050,10 +962,6 @@ abstract class BinaryExpNode extends ExpNode {
     public BinaryExpNode(ExpNode exp1, ExpNode exp2) {
         myExp1 = exp1;
         myExp2 = exp2;
-    }
-
-    public void nameAnalysis(SymTable symbolTablel){
-
     }
 
     // two kids
@@ -1258,9 +1166,4 @@ class GreaterEqNode extends BinaryExpNode {
 		  myExp2.unparse(p, 0);
 		  p.print(")");
     }
-<<<<<<< HEAD
-}
-
-=======
   }
->>>>>>> pushing bunches, taking a stab at handling the symtable lookups for stmts, may need some more thought
