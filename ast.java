@@ -216,11 +216,8 @@ class FnBodyNode extends ASTnode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-      symbolTable.addScope();
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
-      try{symbolTable.removeScope();}
-      catch(EmptySymTableException ex){}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -335,8 +332,13 @@ class FnDeclNode extends DeclNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       myId.nameAnalysisDecl(symbolTable, myType.getTypeString());
+      symbolTable.addScope();
       myFormalsList.nameAnalysis(symbolTable);
       myBody.nameAnalysis(symbolTable);
+      try {
+      	symbolTable.removeScope();
+      } catch (EmptySymTableException ex) {
+      }
     }
 
     public void unparse(PrintWriter p, int indent) {
