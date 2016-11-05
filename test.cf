@@ -8,7 +8,36 @@ int function(int w) {
 }
 
 bool loopyFunc(int c) {
-	return c;
+	if(c > 5) {
+		int fifty;
+		fifty = 50;
+	} else {
+		int fifty;
+		fifty = 50;
+	}
+	return false;
+}
+
+int outOfScope(int outOfScope){
+	
+}
+
+void grabMeSomeGlobals(int x, bool z) {}
+
+void voidFunc(){
+	int y;
+	y = 50;
+	if(y > 10) {
+		int y;
+		y = 10;
+	}
+	while(y > 40){
+		y--;
+	}
+}
+
+int allowDuplicateName() {
+	int allowDuplicateName;
 }
 
 bool anotherFunction(int b, int d) {

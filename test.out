@@ -11,7 +11,37 @@ int function(int w) {
 }
 
 bool loopyFunc(int c) {
-    return c(int);
+    if ((c > 5)) {
+        int fifty;
+        fifty(int) = 50;
+    }
+    else {
+        int fifty;
+        fifty(int) = 50;
+    }
+    return false;
+}
+
+int outOfScope(int outOfScope) {
+}
+
+void grabMeSomeGlobals(int x, bool z) {
+}
+
+void voidFunc() {
+    int y;
+    y(int) = 50;
+    if ((y > 10)) {
+        int y;
+        y(int) = 10;
+    }
+    while ((y > 40)) {
+        y(int)--;
+    }
+}
+
+int allowDuplicateName() {
+    int allowDuplicateName;
 }
 
 bool anotherFunction(int b, int d) {

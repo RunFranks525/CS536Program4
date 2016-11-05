@@ -2,3 +2,30 @@ void g() {
   int b;
   int b;
 }
+int testforDupFunc;
+
+int myFunc(int a, int a){
+	int a;
+	b = t; //Shouldnt reach here
+}
+
+int myFunc(int a) {
+	
+}
+
+int testForDupFunc() {}
+
+void badDecl;
+
+int badStmts(){
+	c = 5;
+	d = c * 12;
+	while(p>q){
+		int a;
+		int b;
+		if(a > b){
+			cin >> "Hello World";
+		}
+	}
+
+}
