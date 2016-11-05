@@ -18,25 +18,17 @@ public class SemSym {
 
 class StructSym extends SemSym{
 
-	private HashMap<String, SemSym> fields;
+	private SymTable fields;
 
 	public StructSym(String type) {
 		super(type);
-		fields = new HashMap<String, SemSym>();
+		fields = new SymTable();
 	}
 
-	public void addField(String name, SemSym symbol){
-		fields.put(name, symbol);
+	public SymTable getSymTable(){
+		return fields;
 	}
 
-	public Boolean contains(String name){
-		if(fields.containsKey(name)) {
-      return true;
-    }
-		else {
-      return false;
-    }
-	}
 }
 
 

@@ -298,9 +298,11 @@ class VarDeclNode extends DeclNode {
 
     public void nameAnalysis(SymTable symbolTable) {
       String varType = myType.getTypeString();
+	myType.nameAnalysis(symbolTable);
+      
       if(!varType.equals("void")){
         myId.nameAnalysisDecl(symbolTable, myType.getTypeString());
-      } else {
+      } else{
         int[] position = myId.getIdPosition();
         ErrMsg.fatal(position[0], position[1],"Non-function declared void");
       }
@@ -392,8 +394,10 @@ class StructDeclNode extends DeclNode {
     }
 
     public void nameAnalysis(SymTable symbolTable) {
-
-
+ 	StructSym sSym = new StructSym("struct");
+	SymTable structSymTable = sSym.getSymTable();
+	myDeclList.nameAnalysis(structSymTable);
+        myId.addStructSym(sSym, symbolTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -417,6 +421,10 @@ class StructDeclNode extends DeclNode {
 
 abstract class TypeNode extends ASTnode {
   abstract public String getTypeString();
+
+  public void nameAnalysis(SymTable symbolTable){
+
+  }
 }
 
 class IntNode extends TypeNode {
@@ -462,6 +470,10 @@ class StructNode extends TypeNode {
     public StructNode(IdNode id) {
 		    myId = id;
     }
+
+   public void nameAnalysis(SymTable symbolTable){
+	myId.nameAnalysisUsage(symbolTable);
+   }
 
     public void unparse(PrintWriter p, int indent) {
         p.print("struct ");
@@ -857,6 +869,20 @@ class IdNode extends ExpNode {
       }
     }
 
+   public void addStructSym(StructSym sSym, SymTable symbolTable){
+	String idKey = this.myStrVal;
+	try {
+         if (symbolTable.lookupLocal(idKey) != null) {
+           throw new DuplicateSymException();
+         } else {
+           symbolTable.addDecl(idKey, sSym);
+         }
+       } catch (DuplicateSymException ex1) {
+         ErrMsg.fatal(this.myLineNum, this.myCharNum, "Multiply declared identifier");
+       } catch (EmptySymTableException ex2) {
+      }
+  }
+
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
 	      if(symbol != null)
@@ -872,6 +898,10 @@ class IdNode extends ExpNode {
 
     public void setSymbol(SemSym symbol) {
       this.symbol = symbol;
+    }
+
+    public String getName(){
+	return myStrVal;
     }
 
     private int myLineNum;
