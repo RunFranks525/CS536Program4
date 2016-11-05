@@ -140,7 +140,10 @@ class ProgramNode extends ASTnode {
         myDeclList.nameAnalysis(symTab);
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
-        symTab.removeScope();
+	try{
+		symTab.removeScope();
+	} catch(EmptySymTableException ex){}
+
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -216,7 +219,8 @@ class FnBodyNode extends ASTnode {
       symbolTable.addScope();
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
-      symbolTable.removeScope();
+      try{symbolTable.removeScope();}
+      catch(EmptySymTableException ex){}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -387,7 +391,7 @@ class StructDeclNode extends DeclNode {
         myDeclList = declList;
     }
 
-    public void nameAnalysis() {
+    public void nameAnalysis(SymTable symbolTable) {
 
 
     }
@@ -593,7 +597,8 @@ class IfStmtNode extends StmtNode {
 	    //Do name analysis on the decl's and the stmt's
 	    myDeclList.nameAnalysis(symbolTable);
 	    myStmtList.nameAnalysis(symbolTable);
-	    symbolTable.removeScope();
+	    try{symbolTable.removeScope();}
+	    catch(EmptySymTableException ex){}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -629,10 +634,12 @@ class IfElseStmtNode extends StmtNode {
 	    //need to add a scope for both the if block and the else block
       symbolTable.addScope();
       nameAnalysis(symbolTable, myThenDeclList, myThenStmtList);
-      symbolTable.removeScope();
+      try{symbolTable.removeScope();}
+      catch(EmptySymTableException ex){}
       symbolTable.addScope();
       nameAnalysis(symbolTable, myElseDeclList, myElseStmtList);
-      symbolTable.removeScope();
+      try{symbolTable.removeScope();}
+      catch(EmptySymTableException ex){}
     }
 
     private void nameAnalysis(SymTable symbolTable, DeclListNode myDeclList, StmtListNode myStmtList) {
@@ -681,7 +688,8 @@ class WhileStmtNode extends StmtNode {
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
       //once done with analysis, remove the current scope
-      symbolTable.removeScope();
+      try{symbolTable.removeScope();}
+      catch(EmptySymTableException ex){}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -851,18 +859,15 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
-        p.print("(" + symbol.getType() + ")");
+	if(symbol != null)
+        	p.print("(" + symbol.getType() + ")");
     }
 
-<<<<<<< HEAD
-    public int getIdPosition() {
+
+
+    public int[] getIdPosition() {
 
       return new int[]{myLineNum, myCharNum};
-
-=======
-    public int[] getIdPosition() {
-      return new int[]{this.myLineNum, this.myCharNum};
->>>>>>> squashing buggies
     }
 
     public void setSymbol(SemSym symbol) {
@@ -893,13 +898,6 @@ class DotAccessExpNode extends ExpNode {
 		  p.print(").");
 		  myId.unparse(p, 0);
     }
-<<<<<<< HEAD
-=======
-
-
-
-    
->>>>>>> didn't change much with SemSym
 
     // 2 kids
     private ExpNode myLoc;

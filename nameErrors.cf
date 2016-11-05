@@ -5,7 +5,6 @@ struct Point {
 int f(int x, bool b) {
 
 	x.n = 2;
-	struct Point p;
 	p.z = 3;
 
 }
@@ -21,7 +20,6 @@ void g() {
 
     p.x = c;
 
-    void q;
 
     b = a == 3;
     f(a + p.y*2, b);

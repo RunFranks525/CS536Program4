@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class SemSym {
     protected String type;
 
@@ -14,13 +16,8 @@ public class SemSym {
     }
 }
 
-<<<<<<< HEAD
-public class StructSym extends SemSym{
-	@Override
-=======
 class StructSym extends SemSym{
 
->>>>>>> Fixing some schtuff in SemSym
 	private HashMap<String, SemSym> fields;
 
 	public StructSym(String type) {
@@ -49,18 +46,14 @@ class FuncSym extends SemSym{
 
 	public FuncSym(String type) {
     super(type);
-		args = new List<String, SemSym>();
+		args = new ArrayList<SemSym>();
 	}
 
 	public void addArg(SemSym symbol) {
 		args.add(symbol);
 	}
 
-<<<<<<< HEAD
 	public int numArgs(){
-=======
-	public void numArgs() {
->>>>>>> Fixing some schtuff in SemSym
 		return args.size();
 	}
 

@@ -26,4 +26,9 @@ class ErrMsg {
     static void warn(int lineNum, int charNum, String msg) {
         System.err.println(lineNum + ":" + charNum + " ***WARNING*** " + msg);
     }
+
+    static Boolean hasFatals(){
+	return foundFatal;
+    }
+
 }

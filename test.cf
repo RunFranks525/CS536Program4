@@ -23,7 +23,8 @@ bool anotherFunction(int b, int c) {
 
 bool loopyFunc(bool f){
 	
-	int p = 0;
+	int p;
+	p = 0;
 	while(!f){
 		p++;
 		if(p >30){
@@ -31,8 +32,6 @@ bool loopyFunc(bool f){
 		}
 	}
 
-	cin read myStruct.w;
-	cout write 4+4;
 
 	return true;
 

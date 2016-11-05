@@ -1,4 +1,4 @@
-mport java.io.*;
+import java.io.*;
 import java_cup.runtime.*;
 
 /**
@@ -55,7 +55,8 @@ public class P4 {
             System.err.println("Exception occured during parse: " + ex);
             System.exit(-1);
         }
-        ((ASTnode)root.value).unparse(outFile, 0);
+	if(!ErrMsg.hasFatals())
+        	((ASTnode)root.value).unparse(outFile, 0);
         outFile.close();
 
         return;

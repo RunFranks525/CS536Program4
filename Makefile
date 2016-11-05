@@ -42,6 +42,9 @@ ErrMsg.class: ErrMsg.java
 test:
 	java  P4 test.cf test.out
 
+bad:
+	java P4 nameErrors.cf nameErrors.out
+
 ###
 # clean
 ###
