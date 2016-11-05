@@ -2,13 +2,16 @@ int x;
 int y;
 bool z;
 struct myStruct { int x; int y; };
-int b;
 
 int function(int w) {
 	return 5;
 }
 
-bool anotherFunction(int b, int c) {
+bool loopyFunc(int c) {
+	return c;
+}
+
+bool anotherFunction(int b, int d) {
 
 	int q;
 
@@ -19,20 +22,4 @@ bool anotherFunction(int b, int c) {
 		b = 4;
 	}
 	return loopyFunc(c < -4);
-}
-
-bool loopyFunc(bool f){
-	
-	int p;
-	p = 0;
-	while(!f){
-		p++;
-		if(p >30){
-			f = true;
-		}
-	}
-
-
-	return true;
-
 }

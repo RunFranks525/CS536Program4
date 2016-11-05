@@ -6,31 +6,22 @@ struct myStruct{
     int y;
 };
 
-int b;
 int function(int w) {
     return 5;
 }
 
-bool anotherFunction(int b, int c) {
-    int q;
-    if ((b < 6)) {
-        b = 10;
-    }
-    else {
-        b = 4;
-    }
-    return loopyFunc((c < (-4)));
+bool loopyFunc(int c) {
+    return c(int);
 }
 
-bool loopyFunc(bool f) {
-    int p;
-    p = 0;
-    while ((!f)) {
-        p++;
-        if ((p > 30)) {
-            f = true;
-        }
+bool anotherFunction(int b, int d) {
+    int q;
+    if ((b < 6)) {
+        b(int) = 10;
     }
-    return true;
+    else {
+        b(int) = 4;
+    }
+    return loopyFunc(bool)((c < (-4)));
 }
 
