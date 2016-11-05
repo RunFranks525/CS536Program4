@@ -55,6 +55,7 @@ public class P4 {
             System.err.println("Exception occured during parse: " + ex);
             System.exit(-1);
         }
+        ((ProgramNode)root.value).nameAnalysis();
 	if(!ErrMsg.hasFatals())
         	((ASTnode)root.value).unparse(outFile, 0);
         outFile.close();

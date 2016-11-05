@@ -140,9 +140,9 @@ class ProgramNode extends ASTnode {
         myDeclList.nameAnalysis(symTab);
         //process the statements, find usage of undeclared variables, and update the ID
         //nodes of the AST to point to the appropriate symbol-table entry
-	try{
-		symTab.removeScope();
-	} catch(EmptySymTableException ex){}
+	      try{
+		      symTab.removeScope();
+	      } catch(EmptySymTableException ex){}
 
     }
 
@@ -859,7 +859,7 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
-	if(symbol != null)
+	      if(symbol != null)
         	p.print("(" + symbol.getType() + ")");
     }
 
