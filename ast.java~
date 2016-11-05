@@ -218,7 +218,11 @@ class FnBodyNode extends ASTnode {
     public void nameAnalysis(SymTable symbolTable) {
       myDeclList.nameAnalysis(symbolTable);
       myStmtList.nameAnalysis(symbolTable);
-
+<<<<<<< HEAD
+=======
+      try{symbolTable.removeScope();}
+      catch(EmptySymTableException ex){}
+>>>>>>> newBranch
     }
 
     public void unparse(PrintWriter p, int indent) {
